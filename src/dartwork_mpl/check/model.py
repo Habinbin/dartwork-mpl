@@ -269,6 +269,25 @@ class ForeignColormap:
     name: str
 
 
+#: Out-of-range ends a colorbar draws, by matplotlib's ``extend``.
+_EXTENDED_ENDS = {"neither": 0, "min": 1, "max": 1, "both": 2}
+
+
+def triangle_ends(extend: str, rect: bool) -> int:
+    """How many out-of-range ends a colorbar draws as triangles:
+    ``extend`` names the ends, ``rect`` (``extendrect``) squares them."""
+    return 0 if rect else _EXTENDED_ENDS[extend]
+
+
+@dataclass(frozen=True)
+class TriangleEnds:
+    """A colorbar that draws its out-of-range ends (``extend``) as triangles."""
+
+    panel: Panel
+    handle: object
+    extend: str
+
+
 @dataclass(frozen=True)
 class Frame:
     """The plot area of an Axes that fills it (a frame, an image, a
@@ -502,6 +521,7 @@ class Facts:
     boxed: tuple[Boxed, ...] = ()
     line_ends: tuple[LineEnd, ...] = ()
     colormaps: tuple[ForeignColormap, ...] = ()
+    triangle_ends: tuple[TriangleEnds, ...] = ()
 
     @property
     def touch(self) -> float:

@@ -37,6 +37,9 @@ FIXES: dict[str, str] = {
     'centre: "diverging" (dc.blue_red, dc.teal_amber, dc.purple_orange ...); '
     "cyclic: dc.hue, dc.halo, dc.corona. Keep a matplotlib map only when "
     "the user asked for it",
+    "COLORBAR_TRIANGLE_ENDS": "square the ends and keep their colours: "
+    "fig.colorbar(..., extendrect=True); or drop them (extend='neither') "
+    "when no value lies past the scale",
     "VALUE_LABEL_ON_DATA": "move the label off the line: a padding past "
     "the error bar (ax.bar_label(bars, padding=...)), or dm.annotate_value "
     "for a point on a line",

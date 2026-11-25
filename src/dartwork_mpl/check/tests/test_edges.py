@@ -28,6 +28,7 @@ from dartwork_mpl.check.model import (
     TickOcclusion,
     TickRow,
     TickValues,
+    TriangleEnds,
 )
 from dartwork_mpl.check.roles import (
     AxisLabel,
@@ -155,6 +156,13 @@ def test_MATPLOTLIB_COLORMAP():
     (f,) = found(Facts(CANVAS, PT, colormaps=(on,)))
     assert f.rule == "MATPLOTLIB_COLORMAP" and f.panels == (2,)
     assert f.artists == (on.handle,) and "dc." in f.fix
+
+
+def test_COLORBAR_TRIANGLE_ENDS():
+    bar = TriangleEnds(Panel(object(), 1), object(), "both")
+    (f,) = found(Facts(CANVAS, PT, triangle_ends=(bar,)))
+    assert f.rule == "COLORBAR_TRIANGLE_ENDS" and f.panels == (1,)
+    assert f.artists == (bar.handle,) and "extendrect=True" in f.fix
 
 
 def test_MISSING_AXIS_LABEL():

@@ -39,6 +39,11 @@ def has_foreign_colormap(facts: Facts, found: Findings) -> bool:
     return bool(facts.colormaps)
 
 
+def has_triangle_ends(facts: Facts, found: Findings) -> bool:
+    """Any colorbar with triangular out-of-range ends."""
+    return bool(facts.triangle_ends)
+
+
 def has_empty(facts: Facts, found: Findings) -> bool:
     """Any framed Axes that draws nothing."""
     return bool(facts.empty)
@@ -252,6 +257,17 @@ EDGES: tuple[EdgeCase[Facts, Findings], ...] = (
         example="test_edges.py::test_MATPLOTLIB_COLORMAP",
         applies=has_foreign_colormap,
         adjust=decide.matplotlib_colormap,
+    ),
+    EdgeCase(
+        name="COLORBAR_TRIANGLE_ENDS",
+        why=(
+            "contour maps drawn with extend='both' got matplotlib's pointed "
+            "ends on their colorbars, two arrowheads on an otherwise "
+            "rectangular scale"
+        ),
+        example="test_edges.py::test_COLORBAR_TRIANGLE_ENDS",
+        applies=has_triangle_ends,
+        adjust=decide.colorbar_triangle_ends,
     ),
     EdgeCase(
         name="MISSING_AXIS_LABEL",

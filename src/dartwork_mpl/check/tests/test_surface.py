@@ -171,6 +171,21 @@ def test_a_matplotlib_colormap_is_found_but_not_a_dc_map_or_a_plain_scatter():
     assert "'viridis'" in found[0].message
 
 
+def test_triangle_colorbar_ends_are_found_but_not_square_or_plain_ones():
+    fig, axes = plt.subplots(1, 3, figsize=dm.figsize("15cm", "5cm"))
+    z = np.arange(12.0).reshape(3, 4)
+    for ax, extend, rect in zip(
+        axes, ("both", "both", "neither"), (False, True, False), strict=True
+    ):
+        filled = ax.contourf(
+            z, levels=[2, 4, 6, 8], cmap="dc.blue", extend=extend
+        )
+        fig.colorbar(filled, ax=ax, label="Value", extendrect=rect)
+    found = _of(dm.check(fig), "COLORBAR_TRIANGLE_ENDS")
+    assert [f.panels for f in found] == [(3,)]  # the first colorbar's Axes
+    assert "'both'" in found[0].message
+
+
 def test_an_axis_of_numbers_needs_a_name_but_not_dates_or_a_named_row():
     fig, axes = plt.subplots(1, 2, figsize=dm.figsize("15cm", "6cm"))
     days = np.arange("2026-01-01", "2026-03-01", dtype="datetime64[D]")

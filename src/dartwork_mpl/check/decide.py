@@ -301,6 +301,19 @@ def matplotlib_colormap(facts: Facts, found: Findings) -> Findings:
     return found
 
 
+def colorbar_triangle_ends(facts: Facts, found: Findings) -> Findings:
+    """Colorbars that point their out-of-range ends, per colorbar."""
+    for c in facts.triangle_ends:
+        found = found.flag(
+            "COLORBAR_TRIANGLE_ENDS",
+            f"Axes[{c.panel.index}]: the colorbar draws its "
+            f"extend={c.extend!r} ends as triangles",
+            handles=(c.handle,),
+            panels=(c.panel.index,),
+        )
+    return found
+
+
 def reads_as_years(ticks: TickValues, axis: Which) -> bool:
     """A linear x axis whose ticks are all whole numbers within
     :data:`YEARS` (``2019, 2020, 2021``): its ticks name themselves.

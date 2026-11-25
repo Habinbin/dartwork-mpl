@@ -274,6 +274,9 @@ plt.close(fig)
   in `fig.colorbar` to fit the slot to the drawn scale, then lay out and
   check again. For an exact width, give the scale a narrow column in the
   plot's GridSpec and pass its Axes as `cax`.
+- Values past the scale (`extend="both"` on `contourf`, or on the colorbar)
+  get square ends, `fig.colorbar(cs, ax=ax, extendrect=True)`: matplotlib
+  draws them as triangles otherwise (`COLORBAR_TRIANGLE_ENDS`).
 - For an inset or a label in open space, look for a region clear of the
   marks it could cover. Leave room around the whole element, including
   its text and any connectors. Within that region, give it an anchor the

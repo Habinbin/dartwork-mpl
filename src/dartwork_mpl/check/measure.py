@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, TypeVar
 import matplotlib
 import numpy as np
 from matplotlib.axes import Axes
+from matplotlib.colorizer import ColorizingArtist
 from matplotlib.inset import InsetIndicator
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.text import Annotation
@@ -76,7 +77,9 @@ from .model import (
     Text,
     TickOcclusion,
     TickRow,
+    TriangleEnds,
     ascii_minus_value,
+    triangle_ends,
 )
 from .occlusion import measure_occlusion
 
@@ -287,6 +290,28 @@ class Reader:
                 if name in matplotlib.colormaps and not name.startswith("dc."):
                     found.append(ForeignColormap(Panel(ax, i), artist, name))
         return tuple(found)
+
+    def triangle_ends(self) -> tuple[TriangleEnds, ...]:
+        """Drawn colorbars of the figure's mappables whose out-of-range
+        ends are triangles, once each, on the colorbar's own Axes."""
+        scales = {id(ax): i for i, ax in self.axes}
+        found: dict[int, TriangleEnds] = {}
+        for _i, ax in self.axes:
+            for artist in ax.get_children():
+                if not isinstance(artist, ColorizingArtist):
+                    continue
+                bar = artist.colorbar
+                if (
+                    bar is None
+                    or id(bar) in found
+                    or id(bar.ax) not in scales
+                    or not triangle_ends(bar.extend, bar.extendrect)
+                ):
+                    continue
+                found[id(bar)] = TriangleEnds(
+                    Panel(bar.ax, scales[id(bar.ax)]), bar, bar.extend
+                )
+        return tuple(found.values())
 
     def polar_theta(self) -> tuple[PolarTheta, ...]:
         """Angle labels and disc extents, for visible full-circle polar plots."""
@@ -727,6 +752,7 @@ def measure(fig: Figure) -> Facts:
         insets=r.attempt(lambda: r.insets(texts), (), "CROSS_AXES_OVERLAP"),
         polar_theta=r.attempt(r.polar_theta, (), "POLAR_TICK_ON_PLOT"),
         colormaps=r.attempt(r.colormaps, (), "MATPLOTLIB_COLORMAP"),
+        triangle_ends=r.attempt(r.triangle_ends, (), "COLORBAR_TRIANGLE_ENDS"),
         minus_labels=minus_labels,
         minus_tick=r.attempt(
             lambda: minus_tick(r.axes, r.text), None, "MIXED_MINUS"
